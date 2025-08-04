@@ -5,15 +5,290 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Package Management System</title>
     <style>
-        /* [Previous CSS remains exactly the same] */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.2em;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .form-section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .package-list {
+            background-color: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        #searchUnit {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        
+        .sign-out {
+            background-color: #e74c3c;
+        }
+        
+        .sign-out:hover {
+            background-color: #c0392b;
+        }
+        
+        .sign-in {
+            background-color: #2ecc71;
+        }
+        
+        .sign-in:hover {
+            background-color: #27ae60;
+        }
+        
+        .sign-in:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .status-signed-in {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+        
+        .status-signed-out {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .form-section, .package-list {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- [Previous HTML structure remains exactly the same until the script section] -->
+    <header>
+        <div class="container">
+            <h1>Package Management System</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="main-content">
+            <section class="form-section">
+                <h2>Package Sign-In</h2>
+                <form id="signInForm">
+                    <div class="form-group">
+                        <label for="shipper">Shipper/Sender</label>
+                        <select id="shipper" required>
+                            <option value="">Select a shipper</option>
+                            <option value="amazon">Amazon</option>
+                            <option value="fedex">FedEx</option>
+                            <option value="ups">UPS</option>
+                            <option value="usps">USPS</option>
+                            <option value="dhl">DHL</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tenantUnit">Tenant Unit Number</label>
+                        <input type="text" id="tenantUnit" placeholder="Enter unit number (e.g., A101, B205)" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trackingNumber">Tracking Number (optional)</label>
+                        <input type="text" id="trackingNumber" placeholder="Enter tracking number if available">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes (optional)</label>
+                        <input type="text" id="notes" placeholder="Any additional information">
+                    </div>
+                    
+                    <button type="submit">Sign In Package</button>
+                </form>
+            </section>
+            
+            <section class="package-list">
+                <h2>Current Packages</h2>
+                <div class="search-container">
+                    <input type="text" id="searchUnit" placeholder="Search by unit number">
+                    <button id="searchBtn">Search</button>
+                    <button id="resetSearch">Show All</button>
+                </div>
+                <table id="packagesTable">
+                    <thead>
+                        <tr>
+                            <th>Date/Time In</th>
+                            <th>Date/Time Out</th>
+                            <th>Shipper</th>
+                            <th>Unit #</th>
+                            <th>Tracking #</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Package rows will be added here dynamically -->
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© 2023 Package Management System. All rights reserved.</p>
+        </div>
+    </footer>
     
     <script>
         // Sample data
-        let packages = [
+        let packages = JSON.parse(localStorage.getItem('packages')) || [
             {
                 id: 1,
                 dateIn: new Date('2023-05-15T10:30:00'),
@@ -49,8 +324,25 @@
             }
         ];
 
-        // [Previous DOM elements and helper functions remain the same until renderPackages()]
-
+        // DOM elements
+        const signInForm = document.getElementById('signInForm');
+        const packagesTable = document.getElementById('packagesTable').getElementsByTagName('tbody')[0];
+        const searchUnit = document.getElementById('searchUnit');
+        const searchBtn = document.getElementById('searchBtn');
+        const resetSearch = document.getElementById('resetSearch');
+        
+        // Format date for display
+        function formatDate(date) {
+            if (!date) return 'N/A';
+            return date.toLocaleString();
+        }
+        
+        // Save packages to localStorage
+        function savePackages() {
+            localStorage.setItem('packages', JSON.stringify(packages));
+        }
+        
+        // Render packages table (with optional filtering)
         function renderPackages(filterUnit = '') {
             packagesTable.innerHTML = '';
             
@@ -84,11 +376,49 @@
                 `;
             });
             
-            // [Previous event listener attachments remain the same]
+            // Add event listeners to action buttons
+            document.querySelectorAll('.sign-out').forEach(btn => {
+                btn.addEventListener('click', signOutPackage);
+            });
+            
+            document.querySelectorAll('.sign-in').forEach(btn => {
+                btn.addEventListener('click', signInPackage);
+            });
         }
-
-        // [Previous signInForm event listener remains the same]
-
+        
+        // Handle package sign-in
+        signInForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const shipper = document.getElementById('shipper').value;
+            const unit = document.getElementById('tenantUnit').value;
+            const tracking = document.getElementById('trackingNumber').value;
+            const notes = document.getElementById('notes').value;
+            
+            const newPackage = {
+                id: packages.length > 0 ? Math.max(...packages.map(p => p.id)) + 1 : 1,
+                dateIn: new Date(),
+                dateOut: null,
+                shipper: document.getElementById('shipper').options[document.getElementById('shipper').selectedIndex].text,
+                unit,
+                tracking,
+                notes,
+                status: 'Signed In',
+                isArchived: false
+            };
+            
+            packages.unshift(newPackage);
+            savePackages();
+            renderPackages();
+            
+            // Reset form
+            signInForm.reset();
+            
+            // Show confirmation
+            alert(`Package for unit ${unit} has been signed in successfully!`);
+        });
+        
+        // Handle package sign-out
         function signOutPackage(e) {
             const packageId = parseInt(e.target.getAttribute('data-id'));
             const pkgIndex = packages.findIndex(p => p.id === packageId);
@@ -98,12 +428,14 @@
                     packages[pkgIndex].status = 'Signed Out';
                     packages[pkgIndex].dateOut = new Date();
                     packages[pkgIndex].isArchived = true;
+                    savePackages();
                     renderPackages();
                     alert(`Package for unit ${packages[pkgIndex].unit} has been signed out at ${formatDate(new Date())}`);
                 }
             }
         }
-
+        
+        // Handle package sign-in (from signed out state)
         function signInPackage(e) {
             if (e.target.disabled) return;
             
@@ -113,12 +445,25 @@
             if (pkgIndex !== -1 && !packages[pkgIndex].isArchived) {
                 packages[pkgIndex].status = 'Signed In';
                 packages[pkgIndex].dateOut = null;
+                savePackages();
                 renderPackages();
                 alert(`Package for unit ${packages[pkgIndex].unit} has been signed back in.`);
             }
         }
-
-        // [Rest of the previous code remains the same]
+        
+        // Handle search
+        searchBtn.addEventListener('click', function() {
+            renderPackages(searchUnit.value);
+        });
+        
+        // Reset search
+        resetSearch.addEventListener('click', function() {
+            searchUnit.value = '';
+            renderPackages();
+        });
+        
+        // Initial render
+        renderPackages();
     </script>
 </body>
 </html>
