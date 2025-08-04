@@ -105,6 +105,16 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        #searchUnit {
+            width: 200px;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -149,6 +159,16 @@
             background-color: #27ae60;
         }
         
+        .status-signed-in {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+        
+        .status-signed-out {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
         footer {
             text-align: center;
             margin-top: 50px;
@@ -177,6 +197,11 @@
             th, td {
                 padding: 8px 10px;
                 font-size: 14px;
+            }
+            
+            #searchUnit {
+                width: 100%;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -227,10 +252,16 @@
             
             <section class="package-list">
                 <h2>Current Packages</h2>
+                <div class="search-container">
+                    <input type="text" id="searchUnit" placeholder="Search by unit number">
+                    <button id="searchBtn">Search</button>
+                    <button id="resetSearch">Show All</button>
+                </div>
                 <table id="packagesTable">
                     <thead>
                         <tr>
-                            <th>Date/Time</th>
+                            <th>Date/Time In</th>
+                            <th>Date/Time Out</th>
                             <th>Shipper</th>
                             <th>Unit #</th>
                             <th>Tracking #</th>
@@ -257,7 +288,8 @@
         let packages = [
             {
                 id: 1,
-                date: new Date('2023-05-15T10:30:00'),
+                dateIn: new Date('2023-05-15T10:30:00'),
+                dateOut: null,
                 shipper: 'Amazon',
                 unit: 'A101',
                 tracking: 'T123456789',
@@ -266,46 +298,63 @@
             },
             {
                 id: 2,
-                date: new Date('2023-05-16T14:15:00'),
+                dateIn: new Date('2023-05-16T14:15:00'),
+                dateOut: new Date('2023-05-16T16:30:00'),
                 shipper: 'FedEx',
                 unit: 'B205',
                 tracking: 'FX987654321',
                 notes: 'Fragile',
-                status: 'Signed In'
+                status: 'Signed Out'
             },
             {
                 id: 3,
-                date: new Date('2023-05-17T09:45:00'),
+                dateIn: new Date('2023-05-17T09:45:00'),
+                dateOut: null,
                 shipper: 'UPS',
                 unit: 'C302',
                 tracking: '1Z999AA1012345678',
                 notes: '',
-                status: 'Signed Out'
+                status: 'Signed In'
             }
         ];
         
         // DOM elements
         const signInForm = document.getElementById('signInForm');
         const packagesTable = document.getElementById('packagesTable').getElementsByTagName('tbody')[0];
+        const searchUnit = document.getElementById('searchUnit');
+        const searchBtn = document.getElementById('searchBtn');
+        const resetSearch = document.getElementById('resetSearch');
         
         // Format date for display
         function formatDate(date) {
+            if (!date) return 'N/A';
             return date.toLocaleString();
         }
         
-        // Render packages table
-        function renderPackages() {
+        // Render packages table (with optional filtering)
+        function renderPackages(filterUnit = '') {
             packagesTable.innerHTML = '';
             
-            packages.forEach(pkg => {
+            const filteredPackages = filterUnit 
+                ? packages.filter(pkg => pkg.unit.toLowerCase().includes(filterUnit.toLowerCase()))
+                : packages;
+            
+            if (filteredPackages.length === 0) {
+                const row = packagesTable.insertRow();
+                row.innerHTML = `<td colspan="7" style="text-align: center;">No packages found</td>`;
+                return;
+            }
+            
+            filteredPackages.forEach(pkg => {
                 const row = packagesTable.insertRow();
                 
                 row.innerHTML = `
-                    <td>${formatDate(pkg.date)}</td>
+                    <td>${formatDate(pkg.dateIn)}</td>
+                    <td>${formatDate(pkg.dateOut)}</td>
                     <td>${pkg.shipper}</td>
                     <td>${pkg.unit}</td>
                     <td>${pkg.tracking || 'N/A'}</td>
-                    <td>${pkg.status}</td>
+                    <td class="status-${pkg.status.replace(' ', '-').toLowerCase()}">${pkg.status}</td>
                     <td>
                         ${pkg.status === 'Signed In' ? 
                           `<button class="action-btn sign-out" data-id="${pkg.id}">Sign Out</button>` : 
@@ -335,7 +384,8 @@
             
             const newPackage = {
                 id: packages.length + 1,
-                date: new Date(),
+                dateIn: new Date(),
+                dateOut: null,
                 shipper: document.getElementById('shipper').options[document.getElementById('shipper').selectedIndex].text,
                 unit,
                 tracking,
@@ -349,7 +399,7 @@
             // Reset form
             signInForm.reset();
             
-            // Show confirmation (in a real app, this might be a toast notification)
+            // Show confirmation
             alert(`Package for unit ${unit} has been signed in successfully!`);
         });
         
@@ -360,8 +410,9 @@
             
             if (pkgIndex !== -1) {
                 packages[pkgIndex].status = 'Signed Out';
+                packages[pkgIndex].dateOut = new Date();
                 renderPackages();
-                alert(`Package for unit ${packages[pkgIndex].unit} has been signed out.`);
+                alert(`Package for unit ${packages[pkgIndex].unit} has been signed out at ${formatDate(new Date())}`);
             }
         }
         
@@ -372,11 +423,22 @@
             
             if (pkgIndex !== -1) {
                 packages[pkgIndex].status = 'Signed In';
-                packages[pkgIndex].date = new Date(); // Update date/time
+                packages[pkgIndex].dateOut = null;
                 renderPackages();
                 alert(`Package for unit ${packages[pkgIndex].unit} has been signed back in.`);
             }
         }
+        
+        // Handle search
+        searchBtn.addEventListener('click', function() {
+            renderPackages(searchUnit.value);
+        });
+        
+        // Reset search
+        resetSearch.addEventListener('click', function() {
+            searchUnit.value = '';
+            renderPackages();
+        });
         
         // Initial render
         renderPackages();
